@@ -154,6 +154,55 @@ impl Exporter {
             uploader: uploader::Uploader::new(
                 config.collector_endpoint,
                 uploader::UploaderFormat::HTTP,
+                reqwest::blocking::Client::new(),
+            ),
+        }
+    }
+}
+
+/// Zipkin exporter builder
+#[derive(Debug)]
+pub struct Builder {
+    config: Option<ExporterConfig>,
+    client: reqwest::blocking::Client,
+}
+
+impl Default for Builder {
+    /// Return the default Exporter Builder.
+    fn default() -> Self {
+        Builder {
+            config: None,
+            client: reqwest::blocking::Client::new(),
+        }
+    }
+}
+
+impl Builder {
+    /// Assign the exporter config.
+    pub fn with_config(self, config: ExporterConfig) -> Self {
+        Builder {
+            config: Some(config),
+            ..self
+        }
+    }
+
+    /// Assign client.
+    pub fn with_client(self, client: reqwest::blocking::Client) -> Self {
+        Builder {
+            client,
+            ..self
+        }
+    }
+    /// Create a new exporter from the builder
+    pub fn init(&self) -> Exporter {
+        let config = self.config.as_ref().unwrap().to_owned();
+
+        Exporter {
+            config: config.clone(),
+            uploader: uploader::Uploader::new(
+                config.collector_endpoint,
+                uploader::UploaderFormat::HTTP,
+                self.client.to_owned(),
             ),
         }
     }

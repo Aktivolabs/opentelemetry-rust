@@ -18,10 +18,10 @@ pub(crate) struct Uploader {
 }
 
 impl Uploader {
-    pub(crate) fn new(collector_endpoint: String, format: UploaderFormat) -> Self {
+    pub(crate) fn new(collector_endpoint: String, format: UploaderFormat, client: reqwest::blocking::Client) -> Self {
         Uploader {
             format,
-            client: reqwest::blocking::Client::new(),
+            client,
             collector_endpoint: format!("http://{}{}", collector_endpoint, API_V2_COLLECTOR_ROUTE),
         }
     }
